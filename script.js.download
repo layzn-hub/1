@@ -1,0 +1,60 @@
+const SUCCESS_URL = "https://sites.google.com/view/layzen";
+const FAILED_URL = "./failed-login.html";
+
+let isLogin = true;
+
+function toggleMode() {
+  isLogin = !isLogin;
+
+  document.getElementById("title").innerText =
+    isLogin ? "Welcome back" : "Create your account";
+
+  document.getElementById("subtitle").innerText =
+    isLogin
+      ? "Please login to your account"
+      : "Start your journey with us";
+
+  document.getElementById("switchText").innerText =
+    isLogin ? "Don’t have an account?" : "Already have an account?";
+
+  document.querySelector(".link-btn").innerText =
+    isLogin ? "Create one" : "Login";
+
+  document.getElementById("nameField").style.display =
+    isLogin ? "none" : "block";
+}
+
+function submitForm() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !password || (!isLogin && !name)) return;
+
+  if (isLogin) login(email, password);
+  else signup(name, email, password);
+}
+
+function signup(name, email, password) {
+  localStorage.setItem(
+    "auth_user",
+    JSON.stringify({ name, email, password })
+  );
+  finish(SUCCESS_URL);
+}
+
+function login(email, password) {
+  const user = JSON.parse(localStorage.getItem("auth_user"));
+
+  if (!user || user.email !== email || user.password !== password) {
+    finish(FAILED_URL);
+    return;
+  }
+
+  finish(SUCCESS_URL);
+}
+
+function finish(url) {
+  window.open(url, "_blank", "noopener,noreferrer");
+  setTimeout(() => window.close(), 300);
+}
